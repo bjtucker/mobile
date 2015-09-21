@@ -139,7 +139,7 @@ namespace Toggl.Joey.UI.Fragments
         private void EnsureCorrectState ()
         {
             // Set toolbar scrollable or not.
-            var _params = (AppBarLayout.LayoutParams) toolBar.LayoutParameters;
+            var _params = new AppBarLayout.LayoutParams (toolBar.LayoutParameters);
 
             if (viewModel.ProjectList.Workspaces.Count > 2) {
                 tabLayout.Visibility = ViewStates.Visible;
@@ -157,11 +157,19 @@ namespace Toggl.Joey.UI.Fragments
         private void OnNewProjectFabClick (object sender, EventArgs e)
         {
             var entryList = new List<TimeEntryData> (viewModel.TimeEntryList);
+            ChangeListWorkspace (entryList, viewModel.ProjectList.Workspaces[viewModel.ProjectList.CurrentWorkspaceIndex].Data.Id);
 
             // Show create project activity instead
             var intent = BaseActivity.CreateDataIntent<NewProjectActivity, List<TimeEntryData>>
                          (Activity, entryList, NewProjectActivity.ExtraTimeEntryDataListId);
             StartActivityForResult (intent, ProjectCreatedRequestCode);
+        }
+
+        private void ChangeListWorkspace (List<TimeEntryData> list, Guid wsId)
+        {
+            foreach (var entry in list) {
+                entry.WorkspaceId = wsId;
+            }
         }
 
         private async void OnItemSelected (object m)
